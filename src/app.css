@@ -1,0 +1,99 @@
+/* Fonts are loaded via <link> in src/app.html so the browser can start
+   fetching them without waiting to parse this stylesheet. */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+	:root {
+		color-scheme: light;
+	}
+
+	html {
+		scroll-behavior: smooth;
+		-webkit-text-size-adjust: 100%;
+	}
+
+	body {
+		@apply bg-paper text-ink font-sans antialiased;
+		font-size: 16px;
+		line-height: 1.6;
+	}
+
+	/* Anchor targets clear the sticky header */
+	:target,
+	[id] {
+		scroll-margin-top: 6rem;
+	}
+
+	::selection {
+		@apply bg-brand-700 text-white;
+	}
+
+	:focus-visible {
+		@apply outline-brand-700 outline-2 outline-offset-2;
+	}
+
+	/* Never remove focus rings — keyboard users need them */
+	:focus:not(:focus-visible) {
+		outline: none;
+	}
+}
+
+@layer components {
+	.shell {
+		@apply mx-auto w-full max-w-shell px-6 sm:px-8 lg:px-12;
+	}
+
+	.label {
+		@apply font-mono text-label font-medium uppercase;
+	}
+
+	/* Rule + number that opens each section */
+	.rule {
+		@apply border-line border-t;
+	}
+
+	.link-underline {
+		@apply decoration-brand-300 hover:decoration-brand-700 underline decoration-1 underline-offset-4 transition-colors duration-200;
+	}
+}
+
+@layer utilities {
+	/* Scroll-reveal: elements start shifted, `.is-visible` is added by the
+	   reveal action once they enter the viewport. */
+	.reveal {
+		opacity: 0;
+		transform: translateY(14px);
+		transition:
+			opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+			transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+		transition-delay: var(--reveal-delay, 0ms);
+	}
+
+	.reveal.is-visible {
+		opacity: 1;
+		transform: none;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	html {
+		scroll-behavior: auto;
+	}
+
+	.reveal {
+		opacity: 1;
+		transform: none;
+		transition: none;
+	}
+
+	*,
+	*::before,
+	*::after {
+		animation-duration: 0.01ms !important;
+		animation-iteration-count: 1 !important;
+		transition-duration: 0.01ms !important;
+	}
+}
