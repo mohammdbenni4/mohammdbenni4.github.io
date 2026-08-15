@@ -46,6 +46,45 @@ where the 3:1 threshold applies.
 Motion is limited to a scroll reveal and the hero's step-response trace, and everything is
 disabled under `prefers-reduced-motion`.
 
+## SEO
+
+Goal: rank for the query **"Mohammd Benni"**.
+
+On-page, already shipped:
+
+- `<title>` and `<h1>` both lead with the full name
+- Meta description, canonical, `robots: index, follow, max-image-preview:large`
+- Open Graph + Twitter card with a real 1200×630 `og.png`
+- JSON-LD `@graph` — `WebSite` + `ProfilePage` + `Person`, where `Person.sameAs`
+  points at LinkedIn, GitHub, and Codeforces
+- `sitemap.xml`, `robots.txt`, semantic headings, prerendered static HTML
+
+Regenerate the preview card after changing the name, role, or brand colour:
+
+```bash
+npm run og   # writes static/og.png
+```
+
+### What still has to happen off-page
+
+Markup makes the page *eligible*; it does not make it rank. For a personal-name query
+the deciding signals are the ones below, and they are yours to do:
+
+1. **Google Search Console** — add `mohammdbenni.me`, verify via DNS TXT, submit
+   `https://mohammdbenni.me/sitemap.xml`, then "Request indexing" on the homepage.
+   Without this, expect to wait weeks for discovery instead of days.
+2. **Link to the domain from profiles that already rank for your name.** This matters
+   more than anything in this repo. Add `mohammdbenni.me` to your LinkedIn *Contact
+   info* and *Website*, your GitHub profile URL field, and your Codeforces profile.
+   These are the same URLs in `Person.sameAs`, so the reference becomes mutual and
+   Google can merge them into one entity.
+3. **Be consistent with the spelling.** "Mohammd Benni" is what the site claims; use
+   that exact form everywhere so the signals reinforce rather than split.
+4. Expect **2–6 weeks** for a new domain to settle for its own name query.
+
+An exact-match domain plus verified profile links is a strong position — the site is
+not the bottleneck after step 2.
+
 ## Deploying to GitHub Pages
 
 The repo ships a workflow at `.github/workflows/deploy.yml` that builds and publishes on

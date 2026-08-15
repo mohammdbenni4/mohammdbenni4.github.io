@@ -11,43 +11,75 @@
 	import Contact from '$lib/components/Contact.svelte';
 	import Footer from '$lib/components/Footer.svelte';
 
-	// Structured data helps recruiters' tooling and search engines resolve who
-	// this page is about.
+	const home = `${meta.url}/`;
+	const ogImage = `${meta.url}/og.png`;
+
+	/**
+	 * Entity graph. The Person node is what lets Google connect this domain to
+	 * the name "Mohammd Benni" and to the LinkedIn/GitHub/Codeforces profiles
+	 * listed in sameAs — the key signal for a name query.
+	 */
 	const jsonLd = {
 		'@context': 'https://schema.org',
-		'@type': 'Person',
-		name: meta.name,
-		url: meta.url,
-		email: `mailto:${contact.email}`,
-		telephone: contact.phoneHref,
-		jobTitle: 'Robotics & Automation Engineer, Full-Stack Developer',
-		address: {
-			'@type': 'PostalAddress',
-			addressLocality: 'Aleppo',
-			addressCountry: 'SY'
-		},
-		alumniOf: {
-			'@type': 'CollegeOrUniversity',
-			name: 'University of Aleppo'
-		},
-		worksFor: {
-			'@type': 'Organization',
-			name: 'SWB Technical Development'
-		},
-		knowsAbout: [
-			'ROS 2',
-			'Robotics',
-			'Embedded systems',
-			'IoT',
-			'Control systems',
-			'Computer vision',
-			'.NET Core',
-			'FastAPI',
-			'System design',
-			'Database design',
-			'PostgreSQL'
-		],
-		sameAs: [contact.linkedin.href, contact.github.href, contact.codeforces.href]
+		'@graph': [
+			{
+				'@type': 'WebSite',
+				'@id': `${meta.url}/#website`,
+				url: home,
+				name: meta.name,
+				inLanguage: 'en',
+				publisher: { '@id': `${meta.url}/#person` }
+			},
+			{
+				'@type': 'ProfilePage',
+				'@id': `${meta.url}/#page`,
+				url: home,
+				name: meta.title,
+				description: meta.description,
+				isPartOf: { '@id': `${meta.url}/#website` },
+				about: { '@id': `${meta.url}/#person` },
+				primaryImageOfPage: ogImage,
+				inLanguage: 'en'
+			},
+			{
+				'@type': 'Person',
+				'@id': `${meta.url}/#person`,
+				name: meta.name,
+				url: home,
+				image: ogImage,
+				email: `mailto:${contact.email}`,
+				telephone: contact.phoneHref,
+				jobTitle: 'Robotics & Automation Engineer, Full-Stack Developer',
+				description: meta.description,
+				address: {
+					'@type': 'PostalAddress',
+					addressLocality: 'Aleppo',
+					addressCountry: 'SY'
+				},
+				alumniOf: {
+					'@type': 'CollegeOrUniversity',
+					name: 'University of Aleppo'
+				},
+				worksFor: {
+					'@type': 'Organization',
+					name: 'SWB Technical Development'
+				},
+				knowsAbout: [
+					'ROS 2',
+					'Robotics',
+					'Embedded systems',
+					'IoT',
+					'Control systems',
+					'Computer vision',
+					'.NET Core',
+					'FastAPI',
+					'System design',
+					'Database design',
+					'PostgreSQL'
+				],
+				sameAs: [contact.linkedin.href, contact.github.href, contact.codeforces.href]
+			}
+		]
 	};
 </script>
 
@@ -55,17 +87,26 @@
 	<title>{meta.title}</title>
 	<meta name="description" content={meta.description} />
 	<meta name="author" content={meta.name} />
+	<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
 
-	<meta property="og:type" content="website" />
+	<meta property="og:type" content="profile" />
 	<meta property="og:site_name" content={meta.name} />
 	<meta property="og:title" content={meta.title} />
 	<meta property="og:description" content={meta.description} />
-	<meta property="og:url" content={meta.url} />
+	<meta property="og:url" content={home} />
 	<meta property="og:locale" content="en_US" />
+	<meta property="og:image" content={ogImage} />
+	<meta property="og:image:width" content="1200" />
+	<meta property="og:image:height" content="630" />
+	<meta property="og:image:alt" content="{meta.name} — Robotics & Automation Engineer, Full-stack developer" />
+	<meta property="profile:first_name" content="Mohammd" />
+	<meta property="profile:last_name" content="Benni" />
 
 	<meta name="twitter:card" content="summary_large_image" />
 	<meta name="twitter:title" content={meta.title} />
 	<meta name="twitter:description" content={meta.description} />
+	<meta name="twitter:image" content={ogImage} />
+	<meta name="twitter:image:alt" content="{meta.name} — Robotics & Automation Engineer" />
 
 	{@html `<script type="application/ld+json">${JSON.stringify(jsonLd)}</script>`}
 </svelte:head>

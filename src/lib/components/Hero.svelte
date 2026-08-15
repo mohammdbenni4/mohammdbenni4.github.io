@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { hero, contact, stats } from '$lib/data/site';
+	import { hero, contact, stats, meta } from '$lib/data/site';
 	import StepResponse from './StepResponse.svelte';
 	import { reveal } from '$lib/actions/reveal';
 </script>
@@ -19,11 +19,21 @@
 					<span class="label text-muted">{hero.status}</span>
 				</div>
 
-				<h1 class="text-display font-semibold" use:reveal={{ delay: 60 }}>
-					{#each hero.headline as line, i (line)}
-						<span class="block {i === hero.headline.length - 1 ? 'text-brand-700' : ''}">{line}</span
-						>
-					{/each}
+				<!-- The name leads the h1: it is the query people search for, and the
+				     one signal the title tag alone was carrying. -->
+				<h1 use:reveal={{ delay: 60 }}>
+					<span
+						class="text-brand-700 mb-5 block font-mono text-base font-medium uppercase tracking-[0.18em] sm:text-lg"
+					>
+						{meta.name}
+					</span>
+					<span class="text-display block font-semibold">
+						{#each hero.headline as line, i (line)}
+							<span class="block {i === hero.headline.length - 1 ? 'text-brand-700' : ''}"
+								>{line}</span
+							>
+						{/each}
+					</span>
 				</h1>
 
 				<div class="mt-8 max-w-prose" use:reveal={{ delay: 140 }}>
