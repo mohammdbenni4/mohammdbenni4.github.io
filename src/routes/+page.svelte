@@ -37,6 +37,9 @@
 				name: meta.title,
 				description: meta.description,
 				isPartOf: { '@id': `${meta.url}/#website` },
+				// Google's ProfilePage spec requires mainEntity (not `about`) to
+				// identify the subject of the page.
+				mainEntity: { '@id': `${meta.url}/#person` },
 				about: { '@id': `${meta.url}/#person` },
 				primaryImageOfPage: ogImage,
 				inLanguage: 'en'
