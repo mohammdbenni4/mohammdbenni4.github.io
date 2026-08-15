@@ -9,7 +9,16 @@ export const meta = {
 	description:
 		'Robotics and automation engineer and full-stack developer in Aleppo, Syria. ROS 2, embedded systems and IoT, computer vision, and .NET/FastAPI backends with a focus on system and database design. Contributor to the Manara robot deployed at the Grand Mosque in Mecca.',
 	url: 'https://mohammdbenni.me',
-	locale: 'en'
+	locale: 'en',
+	/**
+	 * Google Search Console verification.
+	 * Search Console → Add property → URL prefix → "HTML tag" method gives you a
+	 * meta tag; paste ONLY the content="..." value here, then rebuild and push.
+	 * Leave empty to omit the tag entirely.
+	 */
+	googleSiteVerification: '',
+	/** Bing Webmaster Tools, same idea (also feeds DuckDuckGo). */
+	bingSiteVerification: ''
 };
 
 export const contact = {

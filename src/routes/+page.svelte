@@ -88,6 +88,12 @@
 	<meta name="description" content={meta.description} />
 	<meta name="author" content={meta.name} />
 	<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
+	{#if meta.googleSiteVerification}
+		<meta name="google-site-verification" content={meta.googleSiteVerification} />
+	{/if}
+	{#if meta.bingSiteVerification}
+		<meta name="msvalidate.01" content={meta.bingSiteVerification} />
+	{/if}
 
 	<meta property="og:type" content="profile" />
 	<meta property="og:site_name" content={meta.name} />
