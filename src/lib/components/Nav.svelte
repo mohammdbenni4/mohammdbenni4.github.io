@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { nav, contact } from '$lib/data/site';
+	import { nav, whatsappHref } from '$lib/data/site';
+	import WhatsappIcon from './WhatsappIcon.svelte';
 
 	let scrolled = $state(false);
 	let open = $state(false);
@@ -24,7 +25,7 @@
 		<a
 			href="#top"
 			class="group flex items-center gap-2.5"
-			aria-label="Mohammd Benni — back to top"
+			aria-label="Mohammd Benni, back to top"
 		>
 			<span
 				class="bg-brand-700 flex h-8 w-8 items-center justify-center rounded-[3px] font-mono text-[0.7rem] font-semibold tracking-tight text-white"
@@ -45,10 +46,13 @@
 				</a>
 			{/each}
 			<a
-				href="mailto:{contact.email}"
-				class="bg-brand-700 hover:bg-brand-800 cursor-pointer rounded-[3px] px-4 py-2 text-sm font-medium text-white transition-colors duration-200"
+				href={whatsappHref}
+				target="_blank"
+				rel="noopener noreferrer"
+				class="inline-flex cursor-pointer items-center gap-2 rounded-[3px] bg-[#1d8449] px-4 py-2 text-sm font-medium text-white transition-all duration-200 hover:bg-[#16723f] hover:shadow-md"
 			>
-				Email me
+				<WhatsappIcon size={15} />
+				WhatsApp
 			</a>
 		</div>
 
@@ -89,11 +93,14 @@
 					</a>
 				{/each}
 				<a
-					href="mailto:{contact.email}"
+					href={whatsappHref}
+					target="_blank"
+					rel="noopener noreferrer"
 					onclick={close}
-					class="bg-brand-700 mb-3 mt-4 flex min-h-[44px] items-center justify-center rounded-[3px] px-4 text-sm font-medium text-white"
+					class="mb-3 mt-4 flex min-h-[46px] items-center justify-center gap-2 rounded-[3px] bg-[#1d8449] px-4 text-sm font-medium text-white"
 				>
-					Email me
+					<WhatsappIcon size={16} />
+					Chat on WhatsApp
 				</a>
 			</div>
 		</div>

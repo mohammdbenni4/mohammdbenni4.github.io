@@ -52,7 +52,7 @@
 				image: ogImage,
 				email: `mailto:${contact.email}`,
 				telephone: contact.phoneHref,
-				jobTitle: 'Robotics & Automation Engineer, Full-Stack Developer',
+				jobTitle: 'Robotics Engineer, Full-Stack Web Developer',
 				description: meta.description,
 				address: {
 					'@type': 'PostalAddress',
@@ -72,15 +72,21 @@
 					'Robotics',
 					'Embedded systems',
 					'IoT',
-					'Control systems',
 					'Computer vision',
+					'Full-stack web development',
 					'.NET Core',
 					'FastAPI',
+					'SvelteKit',
 					'System design',
 					'Database design',
 					'PostgreSQL'
 				],
-				sameAs: [contact.linkedin.href, contact.github.href, contact.codeforces.href]
+				sameAs: [
+					contact.linkedin.href,
+					contact.github.href,
+					contact.codeforces.href,
+					contact.icpc.href
+				]
 			}
 		]
 	};
@@ -107,7 +113,10 @@
 	<meta property="og:image" content={ogImage} />
 	<meta property="og:image:width" content="1200" />
 	<meta property="og:image:height" content="630" />
-	<meta property="og:image:alt" content="{meta.name} — Robotics & Automation Engineer, Full-stack developer" />
+	<meta
+		property="og:image:alt"
+		content="{meta.name}, robotics engineer and full-stack web developer"
+	/>
 	<meta property="profile:first_name" content="Mohammd" />
 	<meta property="profile:last_name" content="Benni" />
 
@@ -115,7 +124,7 @@
 	<meta name="twitter:title" content={meta.title} />
 	<meta name="twitter:description" content={meta.description} />
 	<meta name="twitter:image" content={ogImage} />
-	<meta name="twitter:image:alt" content="{meta.name} — Robotics & Automation Engineer" />
+	<meta name="twitter:image:alt" content="{meta.name}, robotics engineer" />
 
 	{@html `<script type="application/ld+json">${JSON.stringify(jsonLd)}</script>`}
 </svelte:head>

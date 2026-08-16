@@ -20,35 +20,57 @@ const fontFiles = readdirSync(fontDir)
 const BRAND = '#04451e';
 const PAPER = '#fcfcfa';
 
-// Same underdamped step response as the hero graphic, so the card and the
-// site share a visual signature.
-function stepPath(x0, y0, w, h) {
-	const zeta = 0.28;
-	const wn = 5.4;
-	const wd = wn * Math.sqrt(1 - zeta * zeta);
-	const steps = 200;
-	const tMax = 2.2;
-	const pts = [];
-	for (let i = 0; i <= steps; i++) {
-		const t = (i / steps) * tMax;
-		const y =
-			1 -
-			Math.exp(-zeta * wn * t) *
-				(Math.cos(wd * t) + (zeta / Math.sqrt(1 - zeta * zeta)) * Math.sin(wd * t));
-		pts.push(`${(x0 + (i / steps) * w).toFixed(1)},${(y0 + h - y * h).toFixed(1)}`);
+// Same LIDAR scope as the hero graphic, so the card and the site share a
+// visual signature. Radii come from the same simulated room outline.
+function lidarScope(cx, cy, maxR) {
+	const scanRadius = (deg) => {
+		const rad = (deg * Math.PI) / 180;
+		const dx = Math.abs(Math.sin(rad));
+		const dy = Math.abs(Math.cos(rad));
+		let r = Math.min(190 / (dx || 1e-6), 155 / (dy || 1e-6));
+		if (deg > 38 && deg < 72) r = Math.min(r, 100);
+		if (deg > 196 && deg < 230) r = Math.min(r, 120);
+		if (deg > 298 && deg < 320) r = Math.min(r, 82);
+		return Math.min(r, maxR);
+	};
+
+	const parts = [];
+	for (const r of [maxR * 0.33, maxR * 0.62, maxR * 0.92]) {
+		parts.push(
+			`<circle cx="${cx}" cy="${cy}" r="${r.toFixed(1)}" fill="none" stroke="${BRAND}" stroke-opacity="0.10" stroke-width="2"/>`
+		);
 	}
-	return `M ${pts.join(' L ')}`;
+	parts.push(
+		`<line x1="${cx}" y1="${cy - maxR}" x2="${cx}" y2="${cy + maxR}" stroke="${BRAND}" stroke-opacity="0.08" stroke-width="2"/>`,
+		`<line x1="${cx - maxR}" y1="${cy}" x2="${cx + maxR}" y2="${cy}" stroke="${BRAND}" stroke-opacity="0.08" stroke-width="2"/>`
+	);
+
+	for (let deg = 0; deg < 360; deg += 4) {
+		const r = scanRadius(deg);
+		const rad = (deg * Math.PI) / 180;
+		const x = cx + r * Math.sin(rad);
+		const y = cy - r * Math.cos(rad);
+		// Brighter near the "current" beam bearing for a sense of motion
+		const op = deg > 300 || deg < 30 ? 0.5 : 0.2;
+		parts.push(
+			`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="3.2" fill="${BRAND}" fill-opacity="${op}"/>`
+		);
+	}
+
+	parts.push(
+		`<circle cx="${cx}" cy="${cy}" r="7" fill="${BRAND}" fill-opacity="0.65"/>`,
+		`<line x1="${cx}" y1="${cy}" x2="${cx}" y2="${cy - maxR}" stroke="${BRAND}" stroke-opacity="0.35" stroke-width="3"/>`
+	);
+
+	return parts.join('\n  ');
 }
 
 const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
   <rect width="1200" height="630" fill="${PAPER}"/>
   <rect x="0" y="0" width="1200" height="10" fill="${BRAND}"/>
 
-  <!-- step response, low contrast, behind the text -->
-  <path d="${stepPath(620, 150, 520, 300)}" fill="none" stroke="${BRAND}" stroke-opacity="0.16"
-        stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-  <line x1="620" y1="150" x2="1140" y2="150" stroke="${BRAND}" stroke-opacity="0.18"
-        stroke-width="2" stroke-dasharray="6 8"/>
+  <!-- LIDAR scope, low contrast, behind the text -->
+  ${lidarScope(920, 300, 210)}
 
   <!-- monogram -->
   <rect x="80" y="72" width="60" height="60" rx="8" fill="${BRAND}"/>
@@ -65,9 +87,9 @@ const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" v
   <rect x="80" y="310" width="90" height="5" fill="${BRAND}"/>
 
   <text x="80" y="382" font-family="IBM Plex Sans" font-size="41" font-weight="600"
-        letter-spacing="-1" fill="${BRAND}">Robotics &amp; Automation Engineer</text>
+        letter-spacing="-1" fill="${BRAND}">Robotics Engineer</text>
   <text x="80" y="432" font-family="IBM Plex Sans" font-size="41" font-weight="400"
-        letter-spacing="-1" fill="#5a6560">Full-stack developer</text>
+        letter-spacing="-1" fill="#5a6560">Full-stack web developer</text>
 
   <text x="80" y="520" font-family="JetBrains Mono" font-size="20" fill="#6b7570">ROS 2  ·  C++  ·  .NET Core  ·  FastAPI  ·  PostgreSQL</text>
 
