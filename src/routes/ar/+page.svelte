@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { meta, contact, about as aboutEn } from '$lib/data/site';
+	import { graphAr } from '$lib/schema';
 	import {
 		metaAr,
 		heroAr,
@@ -34,29 +35,11 @@
 	const portrait = `${meta.url}${aboutEn.portrait.src}`;
 
 	/**
-	 * The Arabic page is a second expression of the SAME person, not a second
-	 * person, so the Person node is referenced by the @id the English page
-	 * defines rather than redeclared. Two Person nodes for one human would split
-	 * the entity exactly when the point is to consolidate it.
+	 * Same entity nodes as the English page, same @id values, plus this page's
+	 * own ProfilePage. Sharing the definition is what makes mainEntity resolvable
+	 * here instead of pointing at a node defined somewhere else.
 	 */
-	const jsonLd = {
-		'@context': 'https://schema.org',
-		'@graph': [
-			{
-				'@type': 'ProfilePage',
-				'@id': `${url}#page`,
-				url,
-				name: metaAr.title,
-				description: metaAr.description,
-				isPartOf: { '@id': `${meta.url}/#website` },
-				mainEntity: { '@id': `${meta.url}/#person` },
-				about: { '@id': `${meta.url}/#person` },
-				primaryImageOfPage: portrait,
-				inLanguage: 'ar',
-				translationOfWork: { '@id': `${meta.url}/#page` }
-			}
-		]
-	};
+	const jsonLd = graphAr();
 </script>
 
 <svelte:head>
