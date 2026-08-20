@@ -43,6 +43,27 @@
 			prev();
 		}
 	}
+
+	// Swipe. Horizontal intent only, so vertical page scrolling is never
+	// hijacked, and nothing calls preventDefault.
+	let touchX = 0;
+	let touchY = 0;
+
+	function onTouchStart(e: TouchEvent) {
+		touchX = e.touches[0].clientX;
+		touchY = e.touches[0].clientY;
+		paused = true;
+	}
+
+	function onTouchEnd(e: TouchEvent) {
+		const dx = e.changedTouches[0].clientX - touchX;
+		const dy = e.changedTouches[0].clientY - touchY;
+		if (Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy)) {
+			if (dx < 0) next();
+			else prev();
+		}
+		paused = false;
+	}
 </script>
 
 {#if count > 0}
@@ -56,8 +77,10 @@
 		onfocusin={() => (paused = true)}
 		onfocusout={() => (paused = false)}
 		onkeydown={onKeydown}
+		ontouchstart={onTouchStart}
+		ontouchend={onTouchEnd}
 	>
-		<div class="relative aspect-[16/10] w-full overflow-hidden">
+		<div class="relative aspect-[4/3] w-full overflow-hidden">
 			<div
 				class="flex h-full w-full transition-transform duration-700 ease-out"
 				style="transform: translateX(-{index * 100}%)"
@@ -104,13 +127,18 @@
 					{/each}
 				{:else}
 					{#each slides as slide, i (slide.src)}
-						<figure class="relative h-full w-full shrink-0" aria-roledescription="slide">
+						<figure
+							class="bg-brand-50/50 relative flex h-full w-full shrink-0 items-center justify-center"
+							aria-roledescription="slide"
+						>
+							<!-- contain, not cover: the set mixes portrait and landscape, and
+							     cropping a portrait shot to 16:10 decapitates the robot. -->
 							<img
 								src={slide.src}
 								alt={slide.caption}
 								loading={i === 0 ? 'eager' : 'lazy'}
 								decoding="async"
-								class="h-full w-full object-cover"
+								class="h-full w-full object-contain"
 							/>
 							{#if slide.caption}
 								<figcaption
@@ -130,7 +158,7 @@
 					type="button"
 					onclick={prev}
 					aria-label="Previous photo"
-					class="border-line absolute left-3 top-1/2 flex h-10 w-10 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border bg-white/90 backdrop-blur-sm transition-all duration-200 hover:bg-white hover:shadow-md md:opacity-0 md:group-hover/gal:opacity-100 md:group-focus-within/gal:opacity-100"
+					class="border-line absolute start-3 top-1/2 flex h-10 w-10 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border bg-white/90 backdrop-blur-sm transition-all duration-200 hover:bg-white hover:shadow-md md:opacity-0 md:group-hover/gal:opacity-100 md:group-focus-within/gal:opacity-100"
 				>
 					<svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
 						<path
@@ -146,7 +174,7 @@
 					type="button"
 					onclick={next}
 					aria-label="Next photo"
-					class="border-line absolute right-3 top-1/2 flex h-10 w-10 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border bg-white/90 backdrop-blur-sm transition-all duration-200 hover:bg-white hover:shadow-md md:opacity-0 md:group-hover/gal:opacity-100 md:group-focus-within/gal:opacity-100"
+					class="border-line absolute end-3 top-1/2 flex h-10 w-10 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border bg-white/90 backdrop-blur-sm transition-all duration-200 hover:bg-white hover:shadow-md md:opacity-0 md:group-hover/gal:opacity-100 md:group-focus-within/gal:opacity-100"
 				>
 					<svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
 						<path

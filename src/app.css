@@ -1,5 +1,22 @@
-/* Fonts are loaded via <link> in src/app.html so the browser can start
-   fetching them without waiting to parse this stylesheet. */
+/*
+ * Fonts are self-hosted, not fetched from Google.
+ *
+ * The old <link> in app.html cost a DNS lookup, a TLS handshake and a
+ * round trip to a third-party origin before the page could paint, and it
+ * handed a visitor log to Google on every load. These ship from our own
+ * domain instead, so they are covered by the same connection as the HTML.
+ *
+ * `wght.css` is the variable weight axis: one file covers 100 to 700 rather
+ * than one file per weight. It declares every subset (cyrillic, greek, latin,
+ * vietnamese) but each carries a unicode-range, so the browser downloads only
+ * the subsets actually used. For this site that is latin alone, about 85 KB
+ * for both families.
+ *
+ * Both are woff2 with font-display: swap, so text renders immediately in the
+ * fallback and swaps when the font lands.
+ */
+@import '@fontsource-variable/ibm-plex-sans/wght.css';
+@import '@fontsource-variable/jetbrains-mono/wght.css';
 
 @tailwind base;
 @tailwind components;
@@ -8,6 +25,12 @@
 @layer base {
 	:root {
 		color-scheme: light;
+
+		/* Canvas cannot inherit a CSS colour, so the LIDAR backdrop reads these.
+		   Space separated RGB channels. */
+		--canvas-ink: 4 69 30; /* brand-700, structure and mid of the height ramp */
+		--canvas-low: 104 143 120; /* brand-400, low returns */
+		--canvas-high: 47 163 95; /* signal, tall returns */
 	}
 
 	html {
@@ -17,8 +40,20 @@
 
 	body {
 		@apply bg-paper text-ink font-sans antialiased;
-		font-size: 16px;
+		font-size: 17px;
 		line-height: 1.6;
+		/* Nothing should ever push the page sideways on a phone. */
+		overflow-x: hidden;
+	}
+
+	/* Long unbroken strings (emails, handles, URLs) must not widen the layout. */
+	h1,
+	h2,
+	h3,
+	p,
+	dd,
+	li {
+		overflow-wrap: break-word;
 	}
 
 	/* Anchor targets clear the sticky header */
@@ -43,7 +78,56 @@
 
 @layer components {
 	.shell {
-		@apply mx-auto w-full max-w-shell px-6 sm:px-8 lg:px-12;
+		@apply mx-auto w-full max-w-shell px-5 sm:px-8 lg:px-10 xl:px-14;
+	}
+
+	/*
+	 * Rotating conic sweep used as a live border. A large square spins behind
+	 * the card; the inner surface covers all but a hairline, leaving a green
+	 * highlight travelling around the edge. Pure transform, so it stays on the
+	 * compositor.
+	 */
+	.trace-ring {
+		position: absolute;
+		inset: -75%;
+		background: conic-gradient(
+			from 0deg,
+			transparent 0deg,
+			transparent 236deg,
+			#9ab4a4 286deg,
+			#2fa35f 318deg,
+			#04451e 340deg,
+			transparent 360deg
+		);
+		animation: trace-spin 7s linear infinite;
+		animation-delay: var(--trace-delay, 0s);
+	}
+
+	@keyframes trace-spin {
+		to {
+			transform: rotate(360deg);
+		}
+	}
+
+	/* Continuous highlight travelling down a vertical rail. */
+	.rail-pulse {
+		background: linear-gradient(
+			to bottom,
+			transparent 0%,
+			#04451e 45%,
+			#2fa35f 55%,
+			transparent 100%
+		);
+		animation: rail-travel 4.5s ease-in-out infinite;
+	}
+
+	@keyframes rail-travel {
+		0% {
+			transform: translateY(-100%);
+		}
+		100% {
+			transform: translateY(400%);
+		}
 	}
 
 	.label {
@@ -55,15 +139,112 @@
 		@apply border-line border-t;
 	}
 
+	/* Mobile: the scan gets its own block under the copy, so it only needs its
+	   top and bottom edges feathered. */
+	.lidar-mask {
+		-webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 9%, #000 90%, transparent 100%);
+		mask-image: linear-gradient(to bottom, transparent 0%, #000 9%, #000 90%, transparent 100%);
+	}
+
+	/* From md up it becomes a backdrop beside the copy, so the left edge is
+	   feathered too and the text has clear ground to sit on. */
+	@media (min-width: 768px) {
+		.lidar-mask {
+			-webkit-mask-image:
+				linear-gradient(to right, transparent 0%, #000 38%),
+				linear-gradient(to bottom, transparent 0%, #000 14%, #000 82%, transparent 100%);
+			-webkit-mask-composite: source-in;
+			mask-image:
+				linear-gradient(to right, transparent 0%, #000 38%),
+				linear-gradient(to bottom, transparent 0%, #000 14%, #000 82%, transparent 100%);
+			mask-composite: intersect;
+		}
+	}
+
 	.link-underline {
 		@apply decoration-brand-300 hover:decoration-brand-700 underline decoration-1 underline-offset-4 transition-colors duration-200;
+	}
+
+	/*
+	 * Arabic typography.
+	 *
+	 * Scoped to [lang="ar"] so the shared components keep their existing classes
+	 * and the Arabic page adjusts the metrics underneath them. Three corrections
+	 * matter, and the first is not cosmetic:
+	 *
+	 *   1. letter-spacing must be 0. The display scale uses -0.04em tracking,
+	 *      which is right for Latin and wrong for Arabic: Arabic is a connected
+	 *      script and negative tracking pulls the joins apart, so the word stops
+	 *      looking like one word.
+	 *   2. Leading has to grow. Arabic carries ascenders, descenders and
+	 *      diacritics through the same band, so 0.94 line-height collides. This
+	 *      is what was making the name overlap the content below it.
+	 *   3. Peak sizes come down. "محمد بني" is eight characters against
+	 *      "Mohammd Benni" at thirteen, and Arabic glyphs are taller per em, so
+	 *      the same clamp produces something far bigger than intended.
+	 */
+	[lang='ar'] .text-display {
+		font-size: clamp(2.4rem, 6vw, 4.6rem);
+		line-height: 1.24;
+		letter-spacing: 0;
+	}
+
+	[lang='ar'] .text-headline {
+		font-size: clamp(1.8rem, 3.4vw, 2.9rem);
+		line-height: 1.4;
+		letter-spacing: 0;
+	}
+
+	[lang='ar'] .text-role {
+		font-size: clamp(1.15rem, 2.3vw, 1.8rem);
+		line-height: 1.55;
+		letter-spacing: 0;
+	}
+
+	[lang='ar'] .text-title {
+		font-size: clamp(1.3rem, 1.9vw, 1.75rem);
+		line-height: 1.5;
+		letter-spacing: 0;
+	}
+
+	[lang='ar'] .text-lede {
+		font-size: clamp(1.04rem, 1.35vw, 1.24rem);
+		line-height: 1.95;
+		letter-spacing: 0;
+	}
+
+	/* Body copy and list items need the extra leading too. */
+	[lang='ar'] p,
+	[lang='ar'] li,
+	[lang='ar'] dd {
+		line-height: 1.95;
+	}
+
+	/* The uppercase mono label is a Latin device. In Arabic it renders as
+	   ordinary text, so the tracking and uppercasing are dropped. */
+	[lang='ar'] .label {
+		@apply font-arabic text-[0.8rem] font-medium normal-case;
+		letter-spacing: 0;
+	}
+
+	/*
+	 * Latin runs inside Arabic text (ROS 2, C++, PostgreSQL) are isolated so the
+	 * bidirectional algorithm cannot drag neighbouring punctuation to the wrong
+	 * side. Without this, a full stop after "ROS 2" can jump to the left of it.
+	 */
+	.ltr-term {
+		unicode-bidi: isolate;
+		direction: ltr;
+		@apply font-mono text-[0.92em];
 	}
 }
 
 @layer utilities {
 	/* Scroll-reveal: elements start shifted, `.is-visible` is added by the
 	   reveal action once they enter the viewport. */
-	.reveal {
+	/* Only hide when JS is confirmed present (see the inline script in app.html),
+	   so the page degrades to readable static content rather than a blank one. */
+	.js .reveal {
 		opacity: 0;
 		transform: translateY(14px);
 		transition:
@@ -72,9 +253,35 @@
 		transition-delay: var(--reveal-delay, 0ms);
 	}
 
-	.reveal.is-visible {
+	.js .reveal.is-visible {
 		opacity: 1;
 		transform: none;
+	}
+
+	/* Set by the inline failsafe in app.html if hydration never completes, so a
+	   JS error can never leave the page invisible. */
+	.js.reveal-failsafe .reveal {
+		opacity: 1;
+		transform: none;
+	}
+
+	/* Staggered fade for list items that animate on a loop. */
+	.pulse-dot {
+		animation: dot-pulse 3.2s ease-in-out infinite;
+		animation-delay: var(--dot-delay, 0s);
+	}
+
+	@keyframes dot-pulse {
+		0%,
+		70%,
+		100% {
+			opacity: 0.32;
+			transform: scale(1);
+		}
+		12% {
+			opacity: 1;
+			transform: scale(1.5);
+		}
 	}
 }
 
@@ -83,6 +290,9 @@
 		scroll-behavior: auto;
 	}
 
+	/* Must match .js .reveal specificity or the hidden state would win and the
+	   page would stay blank for reduced-motion users. */
+	.js .reveal,
 	.reveal {
 		opacity: 1;
 		transform: none;
@@ -95,5 +305,22 @@
 		animation-duration: 0.01ms !important;
 		animation-iteration-count: 1 !important;
 		transition-duration: 0.01ms !important;
+	}
+
+	/* Looping decorations settle into a readable static state. */
+	.trace-ring {
+		animation: none;
+		opacity: 0.35;
+	}
+
+	.rail-pulse {
+		animation: none;
+		transform: none;
+		opacity: 0.5;
+	}
+
+	.pulse-dot {
+		animation: none;
+		opacity: 1;
 	}
 }

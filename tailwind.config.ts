@@ -33,23 +33,38 @@ export default {
 				'signal-ink': '#177a43' // 5.2:1 — use whenever signal is text
 			},
 			fontFamily: {
-				sans: ['"IBM Plex Sans"', 'ui-sans-serif', 'system-ui', 'sans-serif'],
-				mono: ['"JetBrains Mono"', 'ui-monospace', 'SFMono-Regular', 'monospace']
+				// "Variable" suffix is the family name the @fontsource-variable
+				// packages register. Without it the @font-face rules never match.
+				sans: ['"IBM Plex Sans Variable"', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+				mono: ['"JetBrains Mono Variable"', 'ui-monospace', 'SFMono-Regular', 'monospace'],
+				/*
+				 * IBM Plex Sans carries no Arabic glyphs, so the Arabic summary would
+				 * fall through to whatever the browser picked. This names the fallback
+				 * explicitly, in preference order across the three desktop platforms,
+				 * and costs nothing: every one of these is a system font.
+				 */
+				arabic: ['"Noto Sans Arabic"', '"Segoe UI"', 'Tahoma', 'Arial', 'sans-serif']
 			},
 			fontSize: {
+				// Card and list copy leans on text-sm / text-xs everywhere, so raising
+				// these two lifts readability across the whole site at once.
+				xs: ['0.8rem', { lineHeight: '1.5' }],
+				sm: ['0.95rem', { lineHeight: '1.62' }],
 				// Fluid display sizes for the editorial hero
-				display: ['clamp(2.75rem, 8.5vw, 7rem)', { lineHeight: '0.94', letterSpacing: '-0.04em' }],
-				headline: ['clamp(2rem, 4.5vw, 3.5rem)', { lineHeight: '1.04', letterSpacing: '-0.03em' }],
-				title: ['clamp(1.35rem, 2.2vw, 1.9rem)', { lineHeight: '1.18', letterSpacing: '-0.02em' }],
-				lede: ['clamp(1.05rem, 1.5vw, 1.3rem)', { lineHeight: '1.6', letterSpacing: '-0.01em' }],
-				label: ['0.7rem', { lineHeight: '1.2', letterSpacing: '0.16em' }]
+				display: ['clamp(2.4rem, 8.5vw, 7rem)', { lineHeight: '0.94', letterSpacing: '-0.04em' }],
+				headline: ['clamp(2.15rem, 4.4vw, 3.9rem)', { lineHeight: '1.04', letterSpacing: '-0.03em' }],
+				// Hero role line: clearly subordinate to the name above it
+				role: ['clamp(1.3rem, 2.9vw, 2.3rem)', { lineHeight: '1.25', letterSpacing: '-0.02em' }],
+				title: ['clamp(1.5rem, 2.3vw, 2.15rem)', { lineHeight: '1.18', letterSpacing: '-0.02em' }],
+				lede: ['clamp(1.12rem, 1.55vw, 1.42rem)', { lineHeight: '1.6', letterSpacing: '-0.01em' }],
+				label: ['0.75rem', { lineHeight: '1.2', letterSpacing: '0.16em' }]
 			},
 			maxWidth: {
-				shell: '78rem',
-				prose: '38rem'
+				shell: '96rem',
+				prose: '44rem'
 			},
 			spacing: {
-				section: 'clamp(5rem, 11vw, 9.5rem)'
+				section: 'clamp(3.5rem, 10vw, 9.5rem)'
 			},
 			borderRadius: {
 				card: '4px'

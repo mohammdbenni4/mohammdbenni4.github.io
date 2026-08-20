@@ -1,19 +1,57 @@
 <!doctype html>
-<html lang="en">
+<html lang="%lang%" dir="%dir%">
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<meta name="theme-color" content="#04451e" />
-		<link rel="icon" href="%sveltekit.assets%/favicon.svg" type="image/svg+xml" />
-		<link rel="apple-touch-icon" href="%sveltekit.assets%/favicon.svg" />
-		<link rel="canonical" href="https://mohammdbenni.me/" />
-		<link rel="preconnect" href="https://fonts.googleapis.com" />
-		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-		<link
-			rel="stylesheet"
-			href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap"
-		/>
+
+		<!--
+			Favicon set.
+
+			This is what Google shows beside the result in search, and it comes from
+			these tags, not from structured data. Its requirements are specific: a
+			square image, at least 48x48 and ideally a multiple of it, reachable at a
+			URL that does not change, and not blocked to crawlers.
+
+			The icon is the MB monogram alone. The full logo carries the name
+			underneath the monogram, and at the 16 to 32 pixels a favicon is actually
+			drawn at, that line degrades into a grey smudge that makes the whole mark
+			look blurred. Dropping it is what keeps the icon legible.
+
+			.ico first for browser tabs and older surfaces, then the larger PNGs for
+			Google, Android and iOS.
+		-->
+		<link rel="icon" href="%sveltekit.assets%/favicon.ico" sizes="any" />
+		<link rel="icon" type="image/png" sizes="96x96" href="%sveltekit.assets%/favicon-96.png" />
+		<link rel="icon" type="image/png" sizes="192x192" href="%sveltekit.assets%/icon-192.png" />
+		<link rel="apple-touch-icon" sizes="180x180" href="%sveltekit.assets%/apple-touch-icon.png" />
+		<link rel="manifest" href="%sveltekit.assets%/site.webmanifest" />
+
+		<!--
+			No canonical here. It used to be hardcoded to the home page, which meant
+			/ar/ shipped two canonicals: its own, and one declaring it a duplicate of
+			the English page. That instructs Google not to index the Arabic page at
+			all. Each route now declares its own.
+		-->
+
+		<!-- Fonts are self-hosted and imported from src/app.css, so there is no
+		     third-party origin to preconnect to. -->
 		%sveltekit.head%
+		<script>
+			// Runs before first paint. Only when this lands do reveal elements start
+			// hidden, so a visitor with JS disabled or blocked reads the page as
+			// plain static content instead of a blank screen.
+			document.documentElement.classList.add('js');
+
+			// Failsafe for the scroll-reveal. Reveal elements start at opacity 0 and
+			// are shown by an action after hydration, so any hydration error would
+			// otherwise leave the whole page blank. This runs independently of
+			// Svelte and force-shows everything after a short grace period.
+			// Normal loads reveal long before it fires, so it is never seen.
+			setTimeout(function () {
+				document.documentElement.classList.add('reveal-failsafe');
+			}, 2500);
+		</script>
 	</head>
 	<body data-sveltekit-preload-data="hover">
 		<div style="display: contents">%sveltekit.body%</div>
