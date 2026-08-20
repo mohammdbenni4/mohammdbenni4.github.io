@@ -15,7 +15,8 @@
 				'A robot in daily public service, a controller that has to fail safely, and seven years of contest infrastructure.'
 		},
 		bench = { title: 'On the bench', aside: 'Also shipped' },
-		projectLabels = undefined
+		projectLabels = undefined,
+		galleryLabels = undefined
 	} = $props();
 </script>
 
@@ -29,7 +30,7 @@
 
 		<div class="mt-10 space-y-6 sm:mt-14 sm:space-y-8 lg:space-y-10">
 			{#each projects as project, i (project.title)}
-				<ProjectCard {project} index={i} labels={projectLabels} />
+				<ProjectCard {project} index={i} labels={projectLabels} {galleryLabels} />
 			{/each}
 		</div>
 

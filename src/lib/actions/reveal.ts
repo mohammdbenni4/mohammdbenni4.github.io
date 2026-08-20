@@ -9,7 +9,7 @@ type RevealOptions = {
 
 /**
  * Adds `.is-visible` once the node scrolls into view, then stops observing.
- * Users who prefer reduced motion get the final state immediately — the CSS
+ * Users who prefer reduced motion get the final state immediately, because the CSS
  * already neutralises the transform, this just avoids the observer entirely.
  */
 export const reveal: Action<HTMLElement, RevealOptions | undefined> = (node, options) => {

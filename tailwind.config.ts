@@ -27,10 +27,10 @@ export default {
 				surface: '#ffffff',
 				ink: '#0e1310',
 				muted: '#5a6560', // 5.9:1 on paper
-				faint: '#6b7570', // 4.6:1 on paper — darkened to clear AA for small text
+				faint: '#6b7570', // 4.6:1 on paper, darkened to clear AA for small text
 				line: '#e3e6e1',
-				signal: '#2fa35f', // dots/indicators only (3.1:1 — non-text AA)
-				'signal-ink': '#177a43' // 5.2:1 — use whenever signal is text
+				signal: '#2fa35f', // dots/indicators only (3.1:1, non-text AA)
+				'signal-ink': '#177a43' // 5.2:1, use whenever signal is text
 			},
 			fontFamily: {
 				// "Variable" suffix is the family name the @fontsource-variable

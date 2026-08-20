@@ -4,7 +4,7 @@ import type { Handle } from '@sveltejs/kit';
  * Sets <html lang> and <html dir> per route.
  *
  * app.html is a single shared template, so without this every page shipped
- * lang="en" — including /ar/, whose content, hreflang and canonical all say
+ * lang="en", including /ar/, whose content, hreflang and canonical all say
  * Arabic. The root lang attribute is one of the signals Google uses to decide
  * what language a page is in, so declaring English on an Arabic page argues
  * against the hreflang pair rather than supporting it. It also decides whether

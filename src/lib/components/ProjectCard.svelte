@@ -1,16 +1,18 @@
 <script lang="ts">
-	import type { Project } from '$lib/data/site';
+	import type { Project, GalleryLabels } from '$lib/data/site';
 	import Gallery from './Gallery.svelte';
 	import { reveal } from '$lib/actions/reveal';
 
 	let {
 		project,
 		index,
-		labels: passedLabels = undefined
+		labels: passedLabels = undefined,
+		galleryLabels = undefined
 	}: {
 		project: Project;
 		index: number;
 		labels?: { built: string; roles: string; press: string };
+		galleryLabels?: GalleryLabels;
 	} = $props();
 
 	/** `undefined` must fall through to English, which a default alone does not do
@@ -155,7 +157,8 @@
 						<Gallery
 							slides={project.gallery.slides}
 							placeholders={project.gallery.placeholders}
-							label="{project.title} photos"
+							label="{project.title} {galleryLabels?.suffix ?? 'photos'}"
+							labels={galleryLabels}
 						/>
 					{/if}
 

@@ -70,7 +70,7 @@
 		@apply outline-brand-700 outline-2 outline-offset-2;
 	}
 
-	/* Never remove focus rings — keyboard users need them */
+	/* Never remove focus rings: keyboard users need them */
 	:focus:not(:focus-visible) {
 		outline: none;
 	}
@@ -161,6 +161,23 @@
 		}
 	}
 
+	/*
+	 * Carousel track.
+	 *
+	 * The slide index arrives as --slide and the direction decides the sign. In
+	 * LTR the track slides left to reveal later slides; in RTL a flex row lays
+	 * them out right to left, so it has to slide the other way. Doing this in CSS
+	 * rather than in the template means the component needs no knowledge of which
+	 * language it is rendering into.
+	 */
+	.gal-track {
+		transform: translateX(calc(var(--slide, 0) * -100%));
+	}
+
+	[dir='rtl'] .gal-track {
+		transform: translateX(calc(var(--slide, 0) * 100%));
+	}
+
 	.link-underline {
 		@apply decoration-brand-300 hover:decoration-brand-700 underline decoration-1 underline-offset-4 transition-colors duration-200;
 	}
@@ -225,6 +242,31 @@
 	[lang='ar'] .label {
 		@apply font-arabic text-[0.8rem] font-medium normal-case;
 		letter-spacing: 0;
+	}
+
+	/*
+	 * Mono type on Arabic text.
+	 *
+	 * JetBrains Mono carries no Arabic glyphs, so every `font-mono` line holding
+	 * Arabic fell through to the browser's generic monospace, a Courier-like face
+	 * that looks broken in Arabic. It affected far more than one line: project and
+	 * graduation context, the supervisor credit, the hero location, system scope,
+	 * contest handles, experience periods and the contact labels.
+	 *
+	 * Font fallback resolves per glyph, so naming the Arabic face *after*
+	 * JetBrains Mono keeps Latin runs monospaced while Arabic picks up a proper
+	 * face. In a mixed line like "SWB AI · المسجد الحرام" the Latin stays
+	 * technical and the Arabic reads normally, which is the intended effect.
+	 */
+	[lang='ar'] .font-mono {
+		font-family:
+			'JetBrains Mono Variable', 'Noto Sans Arabic', 'Segoe UI', Tahoma, Arial, sans-serif;
+	}
+
+	/* Arabic runs small at the mono sizes used for these meta lines, so the
+	   smallest step gets a little back. */
+	[lang='ar'] .font-mono.text-xs {
+		font-size: 0.86rem;
 	}
 
 	/*

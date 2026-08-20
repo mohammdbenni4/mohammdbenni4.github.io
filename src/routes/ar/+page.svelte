@@ -109,6 +109,7 @@
 			header={uiAr.headers.work}
 			bench={uiAr.bench}
 			projectLabels={uiAr.projectLabels}
+			galleryLabels={uiAr.galleryLabels}
 		/>
 		<SystemDesign
 			systemDesign={systemDesignAr}

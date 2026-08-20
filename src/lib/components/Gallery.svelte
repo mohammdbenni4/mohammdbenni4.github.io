@@ -1,11 +1,29 @@
 <script lang="ts">
-	import type { GallerySlide } from '$lib/data/site';
+	import type { GallerySlide, GalleryLabels } from '$lib/data/site';
 
 	let {
 		slides = [],
 		placeholders = 0,
-		label = 'Project photos'
-	}: { slides?: GallerySlide[]; placeholders?: number; label?: string } = $props();
+		label = 'Project photos',
+		/**
+		 * Carousel control labels. These were hardcoded English, so an Arabic
+		 * screen-reader user heard English announcements in the middle of Arabic
+		 * content. Defaults keep every existing call site unchanged.
+		 */
+		labels = {
+			previous: 'Previous photo',
+			next: 'Next photo',
+			goTo: 'Go to photo',
+			slide: 'Placeholder',
+			of: 'of',
+			suffix: 'photos'
+		}
+	}: {
+		slides?: GallerySlide[];
+		placeholders?: number;
+		label?: string;
+		labels?: GalleryLabels;
+	} = $props();
 
 	// Until real photos are dropped in, render labelled placeholders so the
 	// carousel is visible and testable.
@@ -81,16 +99,23 @@
 		ontouchend={onTouchEnd}
 	>
 		<div class="relative aspect-[4/3] w-full overflow-hidden">
+			<!--
+				The slide index goes out as a custom property rather than a baked
+				translateX, because the sign has to flip between writing directions.
+				A flex row in RTL lays the slides out right to left, so the track has
+				to move the opposite way to bring slide 2 into view. The direction
+				lives in CSS (see .gal-track in app.css) where `[dir]` can decide it.
+			-->
 			<div
-				class="flex h-full w-full transition-transform duration-700 ease-out"
-				style="transform: translateX(-{index * 100}%)"
+				class="gal-track flex h-full w-full transition-transform duration-700 ease-out"
+				style="--slide: {index}"
 			>
 				{#if isPlaceholder}
 					{#each Array(count) as _, i (i)}
 						<div
 							class="bg-brand-50/60 flex h-full w-full shrink-0 flex-col items-center justify-center gap-3"
 							aria-roledescription="slide"
-							aria-label="Placeholder {i + 1} of {count}"
+							aria-label="{labels.slide} {i + 1} {labels.of} {count}"
 						>
 							<svg
 								width="34"
@@ -133,10 +158,18 @@
 						>
 							<!-- contain, not cover: the set mixes portrait and landscape, and
 							     cropping a portrait shot to 16:10 decapitates the robot. -->
+							<!--
+								Eager, not lazy. Native lazy loading only fetches an image once it
+								intersects the viewport, and every slide after the first sits
+								translated outside it, so those images were never requested and the
+								slide rendered empty. That is the bug that made the second Manara
+								photo appear blank in both languages. The set is small enough that
+								loading it up front is the right trade for a carousel that works.
+							-->
 							<img
 								src={slide.src}
 								alt={slide.caption}
-								loading={i === 0 ? 'eager' : 'lazy'}
+								loading="eager"
 								decoding="async"
 								class="h-full w-full object-contain"
 							/>
@@ -157,7 +190,7 @@
 				<button
 					type="button"
 					onclick={prev}
-					aria-label="Previous photo"
+					aria-label={labels.previous}
 					class="border-line absolute start-3 top-1/2 flex h-10 w-10 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border bg-white/90 backdrop-blur-sm transition-all duration-200 hover:bg-white hover:shadow-md md:opacity-0 md:group-hover/gal:opacity-100 md:group-focus-within/gal:opacity-100"
 				>
 					<svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
@@ -173,7 +206,7 @@
 				<button
 					type="button"
 					onclick={next}
-					aria-label="Next photo"
+					aria-label={labels.next}
 					class="border-line absolute end-3 top-1/2 flex h-10 w-10 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border bg-white/90 backdrop-blur-sm transition-all duration-200 hover:bg-white hover:shadow-md md:opacity-0 md:group-hover/gal:opacity-100 md:group-focus-within/gal:opacity-100"
 				>
 					<svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
@@ -195,7 +228,7 @@
 					<button
 						type="button"
 						onclick={() => go(i)}
-						aria-label="Go to photo {i + 1}"
+						aria-label="{labels.goTo} {i + 1}"
 						aria-current={i === index}
 						class="h-1.5 cursor-pointer rounded-full transition-all duration-300 {i === index
 							? 'bg-brand-700 w-6'

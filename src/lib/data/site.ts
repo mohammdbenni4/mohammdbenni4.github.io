@@ -209,6 +209,16 @@ export const about = {
 
 export type GallerySlide = { src: string; caption: string };
 
+/** Carousel control labels, so the Arabic page can localise them. */
+export type GalleryLabels = {
+	previous: string;
+	next: string;
+	goTo: string;
+	slide: string;
+	of: string;
+	suffix: string;
+};
+
 export type Project = {
 	title: string;
 	context: string;
@@ -234,7 +244,6 @@ export const projects: Project[] = [
 	{
 		title: 'Manara Robot',
 		context: 'SWB AI, deployed at the Grand Mosque in Mecca',
-		status: 'Deployed',
 		accent: 'Robotics',
 		gallery: {
 			placeholders: 4,
